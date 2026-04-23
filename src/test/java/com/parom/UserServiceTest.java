@@ -10,9 +10,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.OngoingStubbing;
+
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -42,6 +47,9 @@ public class UserServiceTest {
     @DisplayName("User object creator")
     @Test
     void testCreateUser_whenUserDetailsProvided_returnUserObject() {
+        // Arrange
+        Mockito.when(userRepository.save(Mockito.any(User.class))).thenReturn(true);
+
         // Act
         User user = userService.createUser(firstName, lastName, email, password, repeatPassword);
 
