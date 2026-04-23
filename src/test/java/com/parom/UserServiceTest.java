@@ -2,8 +2,10 @@ package com.parom;
 
 import com.parom.data.UserRepository;
 import com.parom.model.User;
+import com.parom.service.EmailVerificationService;
 import com.parom.service.UserService;
 import com.parom.service.UserServiceImpl;
+import com.parom.service.exception.EmailNotificationServiceException;
 import com.parom.service.exception.UserServiceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +20,7 @@ import org.mockito.stubbing.OngoingStubbing;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -28,6 +31,9 @@ public class UserServiceTest {
 
     @Mock
     UserRepository userRepository;
+
+    @Mock
+    EmailVerificationService emailVerificationService;
 
     String firstName;
     String lastName;
@@ -80,7 +86,7 @@ public class UserServiceTest {
 
     @DisplayName("If save() method cause RuntimeException, a UserServiceException is thrown")
     @Test
-    void testCreateUser_whenSaveMethodThrowsException_thenThrowsUserServiceException(){
+    void testCreateUser_whenSaveMethodThrowsException_thenThrowsUserServiceException() {
         // Arrange
         Mockito.when(userRepository.save(Mockito.any(User.class))).thenThrow(RuntimeException.class);
         // Act & Assert
@@ -89,8 +95,21 @@ public class UserServiceTest {
                 () -> userService.createUser(firstName, lastName, email, password, repeatPassword),
                 "Should have thrown UserServiceException instead"
         );
-
         // Assert
+    }
+
+    @DisplayName("EmailNotificationException is handle")
+    @Test
+    void testCreateUser_whenEmailConfirmation_thenThrowsUserServiceException() {
+        Mockito.doThrow(RuntimeException.class).when(emailVerificationService).scheduleEmailConfirmation(Mockito.any(User.class)); // for void methods
+        Mockito.when(userRepository.save(Mockito.any(User.class))).thenReturn(true);
+
+        assertThrows(
+                EmailNotificationServiceException.class,
+                () -> userService.createUser(firstName, lastName, email, password, repeatPassword),
+                "Should have thrown UserServiceException instead"
+        );
+        Mockito.verify(emailVerificationService, times(1)).scheduleEmailConfirmation(Mockito.any(User.class));
     }
 
 

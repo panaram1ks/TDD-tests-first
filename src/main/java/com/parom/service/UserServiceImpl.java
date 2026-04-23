@@ -3,6 +3,7 @@ package com.parom.service;
 import com.parom.data.UserRepository;
 import com.parom.data.UserRepositoryImpl;
 import com.parom.model.User;
+import com.parom.service.exception.EmailNotificationServiceException;
 import com.parom.service.exception.UserServiceException;
 
 import java.util.UUID;
@@ -10,9 +11,11 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
 
     UserRepository userRepository;
+    EmailVerificationService emailVerificationService;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, EmailVerificationService emailVerificationService) {
         this.userRepository = userRepository;
+        this.emailVerificationService = emailVerificationService;
     }
 
     @Override
@@ -35,7 +38,11 @@ public class UserServiceImpl implements UserService {
             throw new UserServiceException(ex.getMessage());
         }
         if (!isUserCreated) throw new UserServiceException("Could not create user");
-
+        try {
+            emailVerificationService.scheduleEmailConfirmation(user);
+        } catch (RuntimeException e) {
+            throw new EmailNotificationServiceException(e.getMessage());
+        }
         return user;
     }
 
