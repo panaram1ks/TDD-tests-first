@@ -4,6 +4,7 @@ import com.parom.data.UserRepository;
 import com.parom.model.User;
 import com.parom.service.UserService;
 import com.parom.service.UserServiceImpl;
+import com.parom.service.exception.UserServiceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -75,6 +76,21 @@ public class UserServiceTest {
                 "Empty first name should cause IllegalArgumentException");
         String message = illegalArgumentException.getMessage();
         assertEquals("Users first name is empty", message, "Exception message is not correct");
+    }
+
+    @DisplayName("If save() method cause RuntimeException, a UserServiceException is thrown")
+    @Test
+    void testCreateUser_whenSaveMethodThrowsException_thenThrowsUserServiceException(){
+        // Arrange
+        Mockito.when(userRepository.save(Mockito.any(User.class))).thenThrow(RuntimeException.class);
+        // Act & Assert
+        assertThrows(
+                UserServiceException.class,
+                () -> userService.createUser(firstName, lastName, email, password, repeatPassword),
+                "Should have thrown UserServiceException instead"
+        );
+
+        // Assert
     }
 
 

@@ -28,8 +28,13 @@ public class UserServiceImpl implements UserService {
         User user = new User(firstName, lastName, email, UUID.randomUUID().toString());
 
 //        UserRepository userRepository = new UserRepositoryImpl(); // Real object (for integration test)! but we want Mock object
-        boolean isUserCreated = userRepository.save(user);
-        if(!isUserCreated) throw new UserServiceException("Could not create user");
+        boolean isUserCreated;
+        try {
+            isUserCreated = userRepository.save(user);
+        } catch (RuntimeException ex) {
+            throw new UserServiceException(ex.getMessage());
+        }
+        if (!isUserCreated) throw new UserServiceException("Could not create user");
 
         return user;
     }
