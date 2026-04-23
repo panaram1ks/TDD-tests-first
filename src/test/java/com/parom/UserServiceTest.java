@@ -1,17 +1,28 @@
 package com.parom;
 
+import com.parom.data.UserRepository;
 import com.parom.model.User;
 import com.parom.service.UserService;
 import com.parom.service.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 
-    UserService userService;
+    @InjectMocks
+    UserServiceImpl userService;
+
+    @Mock
+    UserRepository userRepository;
+
     String firstName;
     String lastName;
     String email;
@@ -20,7 +31,7 @@ public class UserServiceTest {
 
     @BeforeEach
     void init() {
-        this.userService = new UserServiceImpl();
+//        this.userService = new UserServiceImpl(userRepository);
         firstName = "Sergey";
         lastName = "Ivanov";
         email = "test@test.com";
