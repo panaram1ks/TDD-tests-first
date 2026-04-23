@@ -102,6 +102,7 @@ public class UserServiceTest {
     @Test
     void testCreateUser_whenEmailConfirmation_thenThrowsUserServiceException() {
         Mockito.doThrow(RuntimeException.class).when(emailVerificationService).scheduleEmailConfirmation(Mockito.any(User.class)); // for void methods
+//        Mockito.doNothing().when(emailVerificationService).scheduleEmailConfirmation(Mockito.any(User.class));
         Mockito.when(userRepository.save(Mockito.any(User.class))).thenReturn(true);
 
         assertThrows(
