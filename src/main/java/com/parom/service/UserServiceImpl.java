@@ -1,4 +1,4 @@
-package com.parom;
+package com.parom.service;
 
 import com.parom.model.User;
 

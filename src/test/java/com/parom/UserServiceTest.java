@@ -1,6 +1,8 @@
 package com.parom;
 
 import com.parom.model.User;
+import com.parom.service.UserService;
+import com.parom.service.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
