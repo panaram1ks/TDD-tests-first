@@ -3,6 +3,7 @@ package com.parom;
 import com.parom.data.UserRepository;
 import com.parom.model.User;
 import com.parom.service.EmailVerificationService;
+import com.parom.service.EmailVerificationServiceImpl;
 import com.parom.service.UserService;
 import com.parom.service.UserServiceImpl;
 import com.parom.service.exception.EmailNotificationServiceException;
@@ -20,8 +21,8 @@ import org.mockito.stubbing.OngoingStubbing;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -33,7 +34,7 @@ public class UserServiceTest {
     UserRepository userRepository;
 
     @Mock
-    EmailVerificationService emailVerificationService;
+    EmailVerificationServiceImpl emailVerificationService;
 
     String firstName;
     String lastName;
@@ -55,7 +56,7 @@ public class UserServiceTest {
     @Test
     void testCreateUser_whenUserDetailsProvided_returnUserObject() {
         // Arrange
-        Mockito.when(userRepository.save(Mockito.any(User.class))).thenReturn(true);
+        Mockito.when(userRepository.save(any(User.class))).thenReturn(true);
 
         // Act
         User user = userService.createUser(firstName, lastName, email, password, repeatPassword);
@@ -67,7 +68,7 @@ public class UserServiceTest {
         assertEquals(email, user.getEmail(), "user's email is incorrect");
         assertNotNull(user.getId(), "User id is missing");
 
-        Mockito.verify(userRepository, Mockito.times(1)).save(Mockito.any(User.class));
+        Mockito.verify(userRepository, Mockito.times(1)).save(any(User.class));
     }
 
     @DisplayName("Empty first name causes correct exception")
@@ -88,7 +89,7 @@ public class UserServiceTest {
     @Test
     void testCreateUser_whenSaveMethodThrowsException_thenThrowsUserServiceException() {
         // Arrange
-        Mockito.when(userRepository.save(Mockito.any(User.class))).thenThrow(RuntimeException.class);
+        Mockito.when(userRepository.save(any(User.class))).thenThrow(RuntimeException.class);
         // Act & Assert
         assertThrows(
                 UserServiceException.class,
@@ -101,16 +102,26 @@ public class UserServiceTest {
     @DisplayName("EmailNotificationException is handle")
     @Test
     void testCreateUser_whenEmailConfirmation_thenThrowsUserServiceException() {
-        Mockito.doThrow(RuntimeException.class).when(emailVerificationService).scheduleEmailConfirmation(Mockito.any(User.class)); // for void methods
+        Mockito.doThrow(RuntimeException.class).when(emailVerificationService).scheduleEmailConfirmation(any(User.class)); // for void methods
 //        Mockito.doNothing().when(emailVerificationService).scheduleEmailConfirmation(Mockito.any(User.class));
-        Mockito.when(userRepository.save(Mockito.any(User.class))).thenReturn(true);
+        Mockito.when(userRepository.save(any(User.class))).thenReturn(true);
 
         assertThrows(
                 EmailNotificationServiceException.class,
                 () -> userService.createUser(firstName, lastName, email, password, repeatPassword),
                 "Should have thrown UserServiceException instead"
         );
-        Mockito.verify(emailVerificationService, times(1)).scheduleEmailConfirmation(Mockito.any(User.class));
+        Mockito.verify(emailVerificationService, times(1)).scheduleEmailConfirmation(any(User.class));
+    }
+
+    @DisplayName("Schedule Email Confirmation is executed")
+    @Test
+    void testCreateUser_whenUserCreated_scheduleEmailConfirmation() {
+        when(userRepository.save(any(User.class))).thenReturn(true);
+        doCallRealMethod().when(emailVerificationService).scheduleEmailConfirmation(any(User.class));
+
+        userService.createUser(firstName, lastName, email, password, repeatPassword);
+        verify(emailVerificationService, times(1)).scheduleEmailConfirmation(any(User.class));
     }
 
 
