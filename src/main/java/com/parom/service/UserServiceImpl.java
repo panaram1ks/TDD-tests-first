@@ -1,7 +1,6 @@
 package com.parom.service;
 
 import com.parom.data.UserRepository;
-import com.parom.data.UserRepositoryImpl;
 import com.parom.model.User;
 import com.parom.service.exception.EmailNotificationServiceException;
 import com.parom.service.exception.UserServiceException;
@@ -44,6 +43,10 @@ public class UserServiceImpl implements UserService {
             throw new EmailNotificationServiceException(e.getMessage());
         }
         return user;
+    }
+
+    public void demo() {
+        System.out.println("Demo method");
     }
 
 }

@@ -2,9 +2,7 @@ package com.parom;
 
 import com.parom.data.UserRepository;
 import com.parom.model.User;
-import com.parom.service.EmailVerificationService;
 import com.parom.service.EmailVerificationServiceImpl;
-import com.parom.service.UserService;
 import com.parom.service.UserServiceImpl;
 import com.parom.service.exception.EmailNotificationServiceException;
 import com.parom.service.exception.UserServiceException;
@@ -16,9 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.stubbing.OngoingStubbing;
-
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
